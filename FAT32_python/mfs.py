@@ -221,7 +221,8 @@ def main():
 
                         # Don't allow starting offsets to exceed file size
                         if(offset_start >= dir[index].filesize):
-                            print("Error: initial offset is greater than file size")
+                            print("Error: initial offset is greater than file size\n")
+                            continue
 
                         # Adjust readable file size for position offset into file; need to calculate
                         # appropriate number of bytes to read
@@ -235,15 +236,20 @@ def main():
                         
                         # Print out contents of file
                         file.seek(offset)
-                        ## NEED TO FIX PRINTING
                         while( lb != -1 ):
                             if( bytes_to_read_temp < 512):
                                 to_print = struct.unpack(f"<{bytes_to_read_temp}s", file.read(bytes_to_read_temp))[0]
-                                print(''.join('{:x}'.format(x) for x in to_print), end='')
+                                if(len(user_input) >= 5 and user_input[4] == "ascii"):
+                                    print(to_print.decode("ASCII"), end='')
+                                else:
+                                    print(''.join('{:x}'.format(x) for x in to_print), end='')
                                 bytes_to_read_temp = 0
                                 break
                             to_print = struct.unpack("<512s", file.read(512))[0]
-                            print(''.join('{:x}'.format(x) for x in to_print), end='')
+                            if(len(user_input) >= 5 and user_input[4] == "ascii"):
+                                print(to_print.decode("ASCII"), end='')
+                            else:
+                                print(''.join('{:x}'.format(x) for x in to_print), end='')
                             bytes_to_read_temp-= 512
 
                             lb = NextLB(lb, filesystem, file)
@@ -270,7 +276,6 @@ def main():
                     print("Error: rm needs 2 valud arguments\n")
             else:
                 print("Error: command not found\n")
-
         else:
             print("Error: file system must be opened first\n")
 
