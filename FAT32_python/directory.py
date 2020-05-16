@@ -1,6 +1,21 @@
 import struct
 
 def Compare(filename, input):
+    '''
+    Function
+    -----------------------------------------------------------------------------------------------
+    Compares the input to the filename encoded in the filesystem's format to see if they are 
+    equivalent.
+    Parameters
+    -----------------------------------------------------------------------------------------------
+    filename : string
+        Filename presented in the filesystem to compare to.
+    input : string
+        Filename user enters to check against the fileystem's filename
+    Returns
+    -----------------------------------------------------------------------------------------------
+    Returns False if not equal. True if equal.
+    '''
     parse = input.upper()
     parse = parse.split('.')
     adjusted_name = parse[0]
@@ -21,13 +36,17 @@ def FileMatch(dir, match):
     '''
     Function
     -----------------------------------------------------------------------------------------------
-
+    Finds a file name given a filename
     Parameters
     -----------------------------------------------------------------------------------------------
-
+    dir : DirectoryEntry[]
+        A list holding the directory entries
+    match : string
+        The name of the file to read
     Returns
     -----------------------------------------------------------------------------------------------
-
+    Returns -1 if the file could not be found. Else it returns a number from 0 to 15 indicating the
+    index of the file searched.
     '''
     for i in range(16):
         if(dir[i].name[0] == 0xe5):
@@ -45,13 +64,15 @@ def PrintDirectory(dir):
     '''
     Function
     -----------------------------------------------------------------------------------------------
-
+    Given a directory, prints all the files in the directory that should be displayed to a user.
+    Does not display deleted files, system volumes, or system files.
     Parameters
     -----------------------------------------------------------------------------------------------
-
+    dir : DirectoryEntry[]
+        A list of directory entries to print out
     Returns
     -----------------------------------------------------------------------------------------------
-
+    Nothing
     '''
     for i in range(16):
         if(dir[i].name[0] == 0xe5):
@@ -76,13 +97,17 @@ def LBAToOffset(sector, filesystem):
     '''
     Function
     -----------------------------------------------------------------------------------------------
-
+    Finds the starting address of a block of data given the sector number corresponding to that data
+    block.
     Parameters
     -----------------------------------------------------------------------------------------------
-
+    sector : int
+        A sector number.
+    filesystem : FileSystem
+        A class used to hold the information about a given filesystem.
     Returns
     -----------------------------------------------------------------------------------------------
-    
+    The value of the address for that block of data.
     '''
     return (((sector - 2) *  filesystem.BPB_BytesPerSec)
     +(filesystem.BPB_BytesPerSec * filesystem.BPB_RsvdSecCnt)
@@ -93,13 +118,19 @@ def NextLB(sector, filesystem, file):
     '''
     Function
     -----------------------------------------------------------------------------------------------
-
+    Given a logical block address, look up into the first FAT and return the logical block address 
+    of the block in the file.
     Parameters
     -----------------------------------------------------------------------------------------------
-
+    sector : int
+        A sector number.
+    filesystem: FileSystem
+        A class used to hold the information about a given filesystem.
+    file : File
+        The filesystem that is currently opened and has the corresponding FileSystem passed in.
     Returns
     -----------------------------------------------------------------------------------------------
-    
+    Returns -1 if no further blocks. Else returns the next logical block.
     '''
     FATAddress = (filesystem.BPB_BytesPerSec * filesystem.BPB_RsvdSecCnt) + (sector * 4)
     file.seek(FATAddress, 0)
@@ -109,13 +140,14 @@ def GetFileSystemInfo(file):
     '''
     Function
     -----------------------------------------------------------------------------------------------
-
+    Gets the information about the filesystem passed in through 'file'.
     Parameters
     -----------------------------------------------------------------------------------------------
-
+    file : File
+        The current filesystem opened.
     Returns
     -----------------------------------------------------------------------------------------------
-
+    Returns a FileSystem containing all the information about the filesystem opened.
     '''
     # Bytes Per Sector
     file.seek(11, 0)
